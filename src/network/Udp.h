@@ -16,14 +16,15 @@ public:
     Capabilities caps() const override;
 
     void open(const QUrl& target) override;
+    void open(const QString& host, quint16 port);
     void close() override;
     bool isOpen() const override;
     qint64 send(const QByteArray& data) override;
 
 private:
     QUdpSocket sock_;
-    QHostAddress peer_;
-    quint16 peerPort_{0};
+    QString host_{};
+    quint16 port_{};
 };
 
 }

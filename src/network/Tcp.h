@@ -16,6 +16,7 @@ public:
     Capabilities caps() const override;
 
     void open(const QUrl& target) override;
+    void open(const QString& host, quint16 port);
     void close() override;
     bool isOpen() const override;
     qint64 send(const QByteArray& bytes) override;

@@ -2,24 +2,33 @@
 
 namespace RobotNetwork {
 
-Udp::Udp(QObject* parent) : BaseConnection(parent) {}
-
-Capabilities Udp::caps() const {
-    return Capability::Datagram;
-}
-
-void Udp::open(const QUrl &target) {
-    peer_ = QHostAddress(target.host()); peerPort_ = quint16(target.port());
-    connect(&sock_, &QUdpSocket::readyRead, this, [this]{
+Udp::Udp(QObject *parent) : BaseConnection(parent) {
+    connect(&sock_, &QUdpSocket::readyRead, this, [this]() {
         while (sock_.hasPendingDatagrams()) {
-            QByteArray buf; buf.resize(int(sock_.pendingDatagramSize()));
+            QByteArray buf;
+            buf.resize(sock_.pendingDatagramSize());
             sock_.readDatagram(buf.data(), buf.size(), nullptr, nullptr);
             emit received(buf);
         }
     });
-    connect(&sock_, &QUdpSocket::errorOccurred, this, [this](auto){ emit error(sock_.errorString()); });
+
+    connect(&sock_, &QUdpSocket::errorOccurred, this, [this](auto) {
+        emit error(sock_.errorString());
+    });
+}
+
+Capabilities Udp::caps() const { return Capability::Datagram; }
+
+void Udp::open(const QUrl &target) {
+    open(target.host(), target.port());
+}
+
+void Udp::open(const QString &host, const quint16 port) {
+    host_ = host;
+    port_ = port;
     if (!sock_.bind(QHostAddress::AnyIPv4, 0)) {
         emit error("bind failed");
+        return;
     }
     emit connected();
 }
@@ -30,11 +39,11 @@ void Udp::close() {
 }
 
 bool Udp::isOpen() const {
-    return sock_.state() == QAbstractSocket::ConnectedState;
+    return sock_.state() == QAbstractSocket::BoundState;
 }
 
 qint64 Udp::send(const QByteArray &data) {
-    return sock_.writeDatagram(data, peer_, peerPort_);
+    return sock_.writeDatagram(data, QHostAddress(host_), port_);
 }
 
-}
+}  // namespace RobotNetwork

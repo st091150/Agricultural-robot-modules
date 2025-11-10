@@ -14,13 +14,13 @@ add_library(net
         src/network/Base.h
         src/network/Tcp.cc
         src/network/Udp.cc
-        src/network/Http.cc
+        #src/network/Http.cc
 )
 target_include_directories(net PUBLIC include)
 target_link_libraries(net PUBLIC Qt6::Core Qt6::Network)
 
-#add_executable(client main.cpp)
-#target_link_libraris(client PRIVATE net Qt6::Core Qt6::Network)
+add_executable(client main.cpp)
+target_link_libraries(client PRIVATE net Qt6::Core Qt6::Network)
 
-#add_executable(server src/server.cpp)
-#target_link_libraries(server PRIVATE net Qt6::Core Qt6::Network net)
+add_executable(server src/server.cpp)
+target_link_libraries(server PRIVATE net Qt6::Core Qt6::Network net)
