@@ -1,0 +1,6 @@
+path: "E:/wheat/data"   
+train: images/train
+val: images/val
+test: images/test
+nc: 1
+names: [wheat]
