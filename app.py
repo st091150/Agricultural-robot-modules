@@ -20,7 +20,7 @@ from schemas.detect import DetectRequest, DetectResult
 from schemas.fertilizer import FertilizerResult
 
 from workers.manager import start_all_workers, stop_all_workers
-from utils import check_redis, clear_queues
+from utils import check_redis, clear_queues, _validate_base64_image
 
 _DATAURL_RE = re.compile(r"^data:image/[^;]+;base64,", re.IGNORECASE)
 
