@@ -2,7 +2,6 @@
 CREATE TABLE IF NOT EXISTS Clients (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    ip_address TEXT,
     connected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -13,6 +12,7 @@ CREATE TABLE IF NOT EXISTS Robots (
     spec_id INTEGER,
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
     FOREIGN KEY(spec_id) REFERENCES Specifications(id)
 );
 
@@ -47,7 +47,6 @@ CREATE TABLE IF NOT EXISTS Sensors (
     name TEXT NOT NULL,
     type TEXT NOT NULL,
     model TEXT NOT NULL,
-    mounted_position TEXT,
     is_active INTEGER DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -99,7 +98,7 @@ CREATE TABLE IF NOT EXISTS Routes (
 );
 
 -- Таблица секторов
-CREATE TABLE IF NOT EXISTS Sectors (
+CREATE TABLE IF NOT EXISTS Segments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     route_id INTEGER NOT NULL,
     execution_id INTEGER NOT NULL,
@@ -152,12 +151,12 @@ CREATE TABLE IF NOT EXISTS Points (
 -- Таблица наблюдений
 CREATE TABLE IF NOT EXISTS Observation (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    sector_id INTEGER NOT NULL,
+    segment_id INTEGER NOT NULL,
     point_id INTEGER NOT NULL,
     sensor_id INTEGER NOT NULL,
     data_id INTEGER NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(sector_id) REFERENCES Sectors(id),
+    FOREIGN KEY(segment_id) REFERENCES Segments(id),
     FOREIGN KEY(point_id) REFERENCES Points(id),
     FOREIGN KEY(sensor_id) REFERENCES Sensors(id),
     FOREIGN KEY(data_id) REFERENCES Sensor_data(id)
