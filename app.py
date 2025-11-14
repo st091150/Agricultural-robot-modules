@@ -1,9 +1,6 @@
 import os
-import re
 import uuid
 import json
-import base64
-import binascii
 from fastapi import FastAPI, HTTPException
 from contextlib import asynccontextmanager
 from redis.asyncio import Redis, from_url
@@ -17,20 +14,10 @@ from config.redis_settings import (
 from config.app_settings import REQUEST_TIMEOUT
 
 from schemas.detect import DetectRequest, DetectResult
-from schemas.fertilizer import FertilizerResult
+from schemas.fertilizer import FertilizerRequest, FertilizerResult
 
 from workers.manager import start_all_workers, stop_all_workers
 from utils import check_redis, clear_queues, _validate_base64_image
-
-_DATAURL_RE = re.compile(r"^data:image/[^;]+;base64,", re.IGNORECASE)
-
-
-def _validate_base64_image(s: str) -> None:
-    b64 = _DATAURL_RE.sub("", (s or "").strip())
-    try:
-        base64.b64decode(b64, validate=True)
-    except (binascii.Error, ValueError):
-        raise HTTPException(status_code=422, detail="Invalid base64 image")
 
 
 @asynccontextmanager
@@ -82,8 +69,7 @@ async def detect(request: DetectRequest):
 
 
 @app.post("/fertilizer/", response_model=FertilizerResult)
-async def fertilizer(request: DetectRequest):
-    _validate_base64_image(request.image)
+async def fertilizer(request: FertilizerRequest):
     redis = app.state.redis
     task_id = str(uuid.uuid4())
     task = {"task_id": task_id, "type": "fertilizer", "data": request.model_dump()}

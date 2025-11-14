@@ -1,17 +1,38 @@
-import base64, io
-from PIL import Image
+import asyncio
+import time
+import httpx
 import pytest
 
-BASE_URL = "http://127.0.0.1:8000"
+PNG_1x1 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII="
 
-@pytest.fixture(scope="session")
-def base_url():
-    return BASE_URL
+async def post_detect(client, i):
+    payload = {"image": PNG_1x1, "metadata": {"i": i}}
+    r = await client.post("http://127.0.0.1:8000/detect/", json=payload)
+    return i, r
 
-def tiny_png_base64(color=(120, 180, 120)):
-    """生成一张 64x64 的小PNG并转为 data:URI Base64 字符串。"""
-    img = Image.new("RGB", (64, 64), color)
-    buf = io.BytesIO()
-    img.save(buf, format="PNG")
-    b64 = base64.b64encode(buf.getvalue()).decode()
-    return f"data:image/png;base64,{b64}"
+async def post_fertilizer(client, i):
+    # UPDATED: Artem format for fertilizer
+    payload = {"field_id": i, "soil_data": {"value": i}}
+    r = await client.post("http://127.0.0.1:8000/fertilizer/", json=payload)
+    return i, r
+
+@pytest.mark.asyncio
+async def test_both_endpoints_concurrent_small_burst():
+    async with httpx.AsyncClient(timeout=30, follow_redirects=True) as client:
+        tasks = []
+        for i in range(20):
+            tasks.append(post_detect(client, i))
+            tasks.append(post_fertilizer(client, i))
+        results = await asyncio.gather(*tasks)
+        for _, r in results:
+            assert r.status_code == 200
+
+@pytest.mark.asyncio
+async def test_100_requests_in_1s_like_burst():
+    async with httpx.AsyncClient(timeout=60, follow_redirects=True) as client:
+        start = time.perf_counter()
+        tasks = [post_detect(client, i) for i in range(100)]
+        results = await asyncio.gather(*tasks)
+        elapsed = time.perf_counter() - start
+        ok = sum(1 for _, r in results if r.status_code == 200)
+        assert ok >= 90

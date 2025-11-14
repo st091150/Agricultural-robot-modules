@@ -12,11 +12,11 @@ def tiny_png_base64() -> str:
         b'\x00\x00\x00\nIDATx\x9cc`\x00\x00\x00\x02\x00\x01'
         b'\xe2!\xbc3\x00\x00\x00\x00IEND\xaeB`\x82'
     )
-    return base64.b64encode(png_bytes).decode('utf-8')
+    return base64.b64encode(png_bytes).decode("utf-8")
 
 
 @pytest.mark.asyncio
-async def test_order_of_100_requests(base_url="http://127.0.0.1:8081"):
+async def test_order_of_100_requests(base_url="http://127.0.0.1:8000"):
     async with httpx.AsyncClient(timeout=60) as client:
         async def call(i):
             payload = {"image": tiny_png_base64(), "metadata": {"i": i}}

@@ -5,15 +5,18 @@ import pytest
 
 PNG_1x1 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII="
 
+
 async def post_detect(client, i):
     payload = {"image": PNG_1x1, "metadata": {"i": i}}
     r = await client.post("http://127.0.0.1:8000/detect/", json=payload)
     return i, r
 
+
 async def post_fertilizer(client, i):
-    payload = {"image": PNG_1x1, "metadata": {"i": i}}
+    payload = {"field_id": i, "soil_data": {"value": i}}
     r = await client.post("http://127.0.0.1:8000/fertilizer/", json=payload)
     return i, r
+
 
 @pytest.mark.asyncio
 async def test_both_endpoints_concurrent_small_burst():
@@ -25,6 +28,7 @@ async def test_both_endpoints_concurrent_small_burst():
         results = await asyncio.gather(*tasks)
         for _, r in results:
             assert r.status_code == 200
+
 
 @pytest.mark.asyncio
 async def test_100_requests_in_1s_like_burst():

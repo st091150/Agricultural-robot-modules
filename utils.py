@@ -1,15 +1,32 @@
 import sys
-from config.redis_settings import REDIS_HOST
-from redis.asyncio import Redis, from_url
-from workers.validators import QueueName
 import re
 import base64
 from fastapi import HTTPException
+from redis.asyncio import Redis, from_url
+
+from config.redis_settings import REDIS_HOST
+from workers.validators import QueueName
+
 
 _DATAURL_RE = re.compile(r"^data:image/[^;]+;base64,", re.IGNORECASE)
 
+
 def _validate_base64_image(s: str) -> None:
-    b64 = _DATAURL_RE.sub("", (s or "").strip())
+    """
+    Проверка, что пришла либо http(s) URL строка, либо base64-строка
+    (с префиксом data:image/...;base64, или без него).
+    """
+    if not isinstance(s, str) or not s.strip():
+        raise HTTPException(status_code=400, detail="Image field must be a string")
+
+    s = s.strip()
+
+    # 1. Разрешаем обычные http/https ссылки
+    if s.lower().startswith("http://") or s.lower().startswith("https://"):
+        return
+
+    # 2. Иначе считаем, что это base64 (возможно с dataURL-префиксом)
+    b64 = _DATAURL_RE.sub("", s)
     try:
         base64.b64decode(b64, validate=True)
     except Exception:
