@@ -6,4 +6,4 @@ RESULT_TTL = 300  # Время хранения результата в секу
 # Queue settigs
 QUEUE_DETECT = "queue_detect"
 QUEUE_FERTILIZER = "queue_fertilizer"
-CHANNEL_RESULTS = "results_channel"
+

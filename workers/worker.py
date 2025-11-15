@@ -3,7 +3,7 @@ import asyncio
 from typing import Any, Callable, Awaitable
 from redis.asyncio import Redis
 
-from config.redis_settings import RESULT_TTL, CHANNEL_RESULTS
+from config.redis_settings import RESULT_TTL
 from workers.validators import QueueName, validate_queue_and_predict_fn
 
 from models.detect_model import predict as detect_predict
@@ -37,9 +37,6 @@ async def worker(
             except Exception as e:
                 result = {"error": str(e)}
                 await redis.set(task["task_id"], json.dumps(result), ex=RESULT_TTL)
-
-            # Публикуем уведомление о выполненной задаче
-            await redis.publish(CHANNEL_RESULTS, task["task_id"])
 
     except asyncio.CancelledError:
         print(f"🛑 Воркер {queue_name.value} остановлен.")

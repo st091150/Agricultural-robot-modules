@@ -1,6 +1,8 @@
 import os
 import uuid
 import json
+import time
+import asyncio
 from fastapi import FastAPI, HTTPException
 from contextlib import asynccontextmanager
 from redis.asyncio import Redis, from_url
@@ -9,7 +11,6 @@ from config.redis_settings import (
     REDIS_HOST,
     QUEUE_DETECT,
     QUEUE_FERTILIZER,
-    CHANNEL_RESULTS,
 )
 from config.app_settings import REQUEST_TIMEOUT
 
@@ -38,23 +39,16 @@ app = FastAPI(lifespan=lifespan)
 RESPONSE_TIMEOUT_SEC = float(os.getenv("RESPONSE_TIMEOUT_SEC", REQUEST_TIMEOUT))
 
 
-async def wait_for_result(task_id: str, timeout: float, redis: Redis):
-    pubsub = redis.pubsub()
-    await pubsub.subscribe(CHANNEL_RESULTS)
-    try:
-        remaining = float(timeout)
-        while remaining > 0:
-            message = await pubsub.get_message(ignore_subscribe_messages=True, timeout=1)
-            if message and message.get("data") == task_id:
-                data = await redis.get(task_id)
-                return json.loads(data) if data else None
-            remaining -= 1.0
+async def wait_for_result(task_id: str, timeout: float, redis):
+    deadline = time.time() + timeout
+
+    while time.time() < deadline:
         data = await redis.get(task_id)
         if data:
             return json.loads(data)
-        raise HTTPException(status_code=504, detail="Timeout waiting for result")
-    finally:
-        await pubsub.unsubscribe(CHANNEL_RESULTS)
+        await asyncio.sleep(0.05)  # короткая асинхронная пауза
+
+    raise HTTPException(status_code=504, detail="Timeout waiting for result")
 
 
 @app.post("/detect/", response_model=DetectResult)
