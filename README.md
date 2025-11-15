@@ -1,62 +1,28 @@
-\# AgroScout
+# AgroScout
 
+## Структура проекта
 
+- **src/** - исходные коды
+  - **db/**
+    - **sqlitedb/**
+      - `sqlitedb.cpp` - реализация методов работы с SQLite
+      - `sqlitedb.h` - объявления классов и методов
+  - **sql/**
+    - `schema.sql` - SQL-скрипт для создания схемы базы данных
+  - **tests/**
+    - **sqlitedbtest/**
+      - `dbtests.cpp` - юнит-тесты для SQLiteDb
+      - `dbtests.h` - заголовочный файл тестов
 
-\## Структура проекта
+- **include/** - заголовочные файлы и интерфейсы
+  - **dbinterface/**
+    - `dbinterface.h` - интерфейс работы с БД
+  - **config/**
+    - `config.h` - конфигурационные параметры
+  - **status/**
+    - `statuscodes.h` - коды статусов для работы с БД
+    - `statusmapper.h` - функции для перевода кода в сообщение
+    - `logmessages.h` - шаблоны и константы сообщений логирования
 
-
-
-AgroScout/
-
-│
-
-├─ src/
-
-│   ├─ db/
-
-│   │   ├─ sqlitedb/
-
-│   │   │   ├─ sqlitedb.cpp        # Реализация методов работы с SQLite
-
-│   │   │   ├─ sqlitedb.h          # Заголовочный файл с объявлениями классов и методов
-
-│   ├─ sql/
-
-│   │   └─ schema.sql               # Схема базы данных (SQL скрипт)
-
-│   └─ tests/
-
-│       └─ sqlitedbtest/
-
-│           ├─ dbtests.cpp         # Юнит-тесты для SQLiteDb
-
-│           └─ dbtests.h           # Заголовочный файл тестов
-
-│
-
-├─ include/
-
-│   ├─ dbinterface/
-
-│   │   └─ dbinterface.h           # Интерфейс работы с БД
-
-│   ├─ config/
-
-│   │   └─ config.h                # Конфигурационные параметры
-
-│   └─ status/
-
-│       ├─ statuscodes.h           # Коды статусов для работы с БД
-
-│       ├─ statusmapper.h          # Функции для перевода кода в сообщение
-
-│       └─ logmessages.h           # Шаблоны и константы сообщений логирования
-
-│
-
-├─ CMakeLists.txt                  # CMake конфигурация проекта
-
-└─ README.md                        # Документация и описание проекта
-
-
-
+- `CMakeLists.txt` - конфигурация сборки CMake
+- `README.md` - документация проекта
