@@ -1,5 +1,7 @@
 #include "dbtests.h"
 #include "sqlitedb.h"
+#include "datatypes.h"
+
 #include <QtTest>
 
 // ============================================
@@ -57,14 +59,16 @@ void DbTests::cleanupTestCase()
 void DbTests::testAddClient()
 {
     // Проверка добавления обычного клиента
-    QCOMPARE(db.addClient("Test Client"), StatusCode::SUCCESS);
+    ClientData client{"Test Client"};
+    QCOMPARE(db.addClient(client), StatusCode::SUCCESS);
 }
 
 void DbTests::testAddClientEmptyName()
 {
     // Проверка добавления клиента с пустым именем
     // Должен вернуть ошибку SQL запроса
-    QCOMPARE(db.addClient(""), StatusCode::DB_QUERY_FAILED);
+    ClientData client{""};
+    QCOMPARE(db.addClient(client), StatusCode::DB_QUERY_FAILED);
 }
 
 void DbTests::testSelectClient()
@@ -81,7 +85,8 @@ void DbTests::testSelectClient()
 void DbTests::testUpdateClient()
 {
     // Добавляем клиента для теста
-    QCOMPARE(db.addClient("ClientToUpdate"), StatusCode::SUCCESS);
+    ClientData client{"ClientToUpdate"};
+    QCOMPARE(db.addClient(client), StatusCode::SUCCESS);
 
     // Обновляем имя напрямую через SQL
     auto updateResult = db.executeSQL(
@@ -114,7 +119,8 @@ void DbTests::testDeleteClient()
 void DbTests::testAddSpecification()
 {
     // Добавление новой спецификации
-    QCOMPARE(db.addSpecification("v1.1"), StatusCode::SUCCESS);
+    SpecificationData spec{"v1.1"};
+    QCOMPARE(db.addSpecification(spec), StatusCode::SUCCESS);
 }
 
 void DbTests::testAddRobot()
@@ -124,7 +130,8 @@ void DbTests::testAddRobot()
     int specId = select.data.value<QVector<QVariantMap>>().first()["id"].toInt();
 
     // Добавление робота, привязанного к спецификации
-    QCOMPARE(db.addRobot("TestRobot", specId, "Описание робота"), StatusCode::SUCCESS);
+    RobotData robot{"TestRobot", specId, "Описание робота"};
+    QCOMPARE(db.addRobot(robot), StatusCode::SUCCESS);
 }
 
 // =====================
@@ -133,30 +140,37 @@ void DbTests::testAddRobot()
 void DbTests::testAddMLResult()
 {
     // Создаём временного клиента для ML-теста
-    QCOMPARE(db.addClient("MLTestClient"), StatusCode::SUCCESS);
+    ClientData client{"MLTestClient"};
+    QCOMPARE(db.addClient(client), StatusCode::SUCCESS);
 
     // Получаем ID клиента
     auto selectClient = db.executeSQL("SELECT id FROM Clients WHERE name='MLTestClient';");
     int clientId = selectClient.data.value<QVector<QVariantMap>>().first()["id"].toInt();
 
     // Создаём спецификацию и робота для ML-теста
-    QCOMPARE(db.addSpecification("MLTestSpec"), StatusCode::SUCCESS);
+    SpecificationData spec{"MLTestSpec"};
+    QCOMPARE(db.addSpecification(spec), StatusCode::SUCCESS);
+
     auto selectSpec = db.executeSQL("SELECT id FROM Specifications WHERE version='MLTestSpec';");
     int specId = selectSpec.data.value<QVector<QVariantMap>>().first()["id"].toInt();
 
-    QCOMPARE(db.addRobot("MLTestRobot", specId, "Для ML теста"), StatusCode::SUCCESS);
+    RobotData robot{"MLTestRobot", specId, "Для ML теста"};
+    QCOMPARE(db.addRobot(robot), StatusCode::SUCCESS);
+
     auto selectRobot = db.executeSQL("SELECT id FROM Robots WHERE model='MLTestRobot';");
     int robotId = selectRobot.data.value<QVector<QVariantMap>>().first()["id"].toInt();
 
     // Создаём сессию
-    QCOMPARE(db.addSession(clientId, robotId, specId, -1, "active"), StatusCode::SUCCESS);
+    SessionData session{clientId, robotId, specId, -1, "active"};
+    QCOMPARE(db.addSession(session), StatusCode::SUCCESS);
 
     // Получаем ID созданной сессии
     auto selectSession = db.executeSQL("SELECT id FROM Sessions ORDER BY id DESC LIMIT 1;");
     int sessionId = selectSession.data.value<QVector<QVariantMap>>().first()["id"].toInt();
 
     // Добавляем ML результат и проверяем статус
-    QCOMPARE(db.addMLResult(sessionId, "MLModule", "{\"result\":42}", 0.95), StatusCode::SUCCESS);
+    MLResultData mlResult{sessionId, "MLModule", "{\"result\":42}", 0.95};
+    QCOMPARE(db.addMLResult(mlResult), StatusCode::SUCCESS);
 }
 
 // =====================

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+
 #include "sqlitedb.h"
 #include "config.h"
 

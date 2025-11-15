@@ -3,6 +3,7 @@
 #include "statusmapper.h"
 #include "config.h"
 
+
 #include <QSqlError>
 #include <QFile>
 #include <QTextStream>
@@ -140,16 +141,16 @@ SQLResult SQLiteDb::executeSQL(const QString &queryText)
 
 // -------------------- Основные функции добавления --------------------
 
-StatusCode SQLiteDb::addClient(const QString &name)
+StatusCode SQLiteDb::addClient(const ClientData& data)
 {
-    if (name.isEmpty()) {
+    if (data.name.isEmpty()) {
 
         return StatusCode::DB_QUERY_FAILED;
     }
 
     QSqlQuery query(db);
     query.prepare("INSERT INTO Clients (name) VALUES (:name)");
-    query.bindValue(":name", name);
+    query.bindValue(":name", data.name);
 
     if (!query.exec()) {
         qWarning() << statusToMessage(StatusCode::DB_QUERY_FAILED) << query.lastError().text();
@@ -159,9 +160,9 @@ StatusCode SQLiteDb::addClient(const QString &name)
 }
 
 
-StatusCode SQLiteDb::addSensor(const QString &name,  const QString &type,   const QString &model)
+StatusCode SQLiteDb::addSensor(const SensorData& data)
 {  
-    if (name.isEmpty() || type.isEmpty() || model.isEmpty()) {
+    if (data.name.isEmpty() || data.type.isEmpty() || data.model.isEmpty()) {
 
         return StatusCode::DB_QUERY_FAILED;
     }
@@ -169,9 +170,9 @@ StatusCode SQLiteDb::addSensor(const QString &name,  const QString &type,   cons
     QSqlQuery query(db);
     query.prepare("INSERT INTO Sensors (name, type, model) "
                   "VALUES (:name, :type, :model)");
-    query.bindValue(":name", name);
-    query.bindValue(":type", type);
-    query.bindValue(":model", model);
+    query.bindValue(":name", data.name);
+    query.bindValue(":type", data.type);
+    query.bindValue(":model", data.model);
 
     if (!query.exec()) {
         qWarning() << statusToMessage(StatusCode::DB_QUERY_FAILED) << query.lastError().text();
@@ -181,16 +182,16 @@ StatusCode SQLiteDb::addSensor(const QString &name,  const QString &type,   cons
 }
 
 
-StatusCode SQLiteDb::addSpecification(const QString &version)
+StatusCode SQLiteDb::addSpecification(const SpecificationData& data)
 {
-    if (version.isEmpty()){
+    if (data.version.isEmpty()){
 
         return StatusCode::DB_QUERY_FAILED;
     }
 
     QSqlQuery query(db);
     query.prepare("INSERT INTO Specifications (version) VALUES (:version)");
-    query.bindValue(":version", version);
+    query.bindValue(":version", data.version);
 
     if (!query.exec()) {
         qWarning() << statusToMessage(StatusCode::DB_QUERY_FAILED) << query.lastError().text();
@@ -199,18 +200,18 @@ StatusCode SQLiteDb::addSpecification(const QString &version)
     return StatusCode::SUCCESS;
 }
 
-StatusCode SQLiteDb::addSensorSpecification(int sensorId, const QString &type, int bytes)
+StatusCode SQLiteDb::addSensorSpecification(const SensorSpecData& data)
 {
-    if (sensorId <= 0 || type.isEmpty() || bytes <= 0) {
+    if (data.sensorId <= 0 || data.type.isEmpty() || data.bytes <= 0) {
 
         return StatusCode::DB_QUERY_FAILED;
     }
 
     QSqlQuery query(db);
     query.prepare("INSERT INTO Sensor_specification (sensor_id, type, bytes) VALUES (:s,:t,:b)");
-    query.bindValue(":s", sensorId);
-    query.bindValue(":t", type);
-    query.bindValue(":b", bytes);
+    query.bindValue(":s", data.sensorId);
+    query.bindValue(":t", data.type);
+    query.bindValue(":b", data.bytes);
 
 
     if (!query.exec()) {
@@ -220,17 +221,17 @@ StatusCode SQLiteDb::addSensorSpecification(int sensorId, const QString &type, i
     return StatusCode::SUCCESS;
 }
 
-StatusCode SQLiteDb::addSpecSens(int specId, int sensorSpecId) \
+StatusCode SQLiteDb::addSpecSens(const SpecSensData& data)
 {
-    if (specId <= 0 || sensorSpecId <= 0) {
+    if (data.specId <= 0 || data.sensorSpecId <= 0) {
 
         return StatusCode::DB_QUERY_FAILED;
     }
 
     QSqlQuery query(db);
     query.prepare("INSERT INTO specSens (specification_id, sensor_spec_id) VALUES (:sp,:ss)");
-    query.bindValue(":sp", specId);
-    query.bindValue(":ss", sensorSpecId);
+    query.bindValue(":sp", data.specId);
+    query.bindValue(":ss", data.sensorSpecId);
 
 
     if (!query.exec()) {
@@ -240,9 +241,9 @@ StatusCode SQLiteDb::addSpecSens(int specId, int sensorSpecId) \
     return StatusCode::SUCCESS;
 }
 
-StatusCode SQLiteDb::addRobot(const QString &model, int specId, const QString &description)
+StatusCode SQLiteDb::addRobot(const RobotData& data)
 {
-    if (model.isEmpty() || specId <= 0){
+    if (data.model.isEmpty() || data.specId <= 0){
 
         return StatusCode::DB_QUERY_FAILED;
     }
@@ -250,9 +251,9 @@ StatusCode SQLiteDb::addRobot(const QString &model, int specId, const QString &d
 
     QSqlQuery query(db);
     query.prepare("INSERT INTO Robots (model, spec_id, description) VALUES (:model, :spec, :desc)");
-    query.bindValue(":model", model);
-    query.bindValue(":spec", specId);
-    query.bindValue(":desc", description);
+    query.bindValue(":model", data.model);
+    query.bindValue(":spec", data.specId);
+    query.bindValue(":desc", data.description);
 
     if (!query.exec()) {
         qWarning() << statusToMessage(StatusCode::DB_QUERY_FAILED) << query.lastError().text();
@@ -261,18 +262,17 @@ StatusCode SQLiteDb::addRobot(const QString &model, int specId, const QString &d
     return StatusCode::SUCCESS;
 }
 
-StatusCode SQLiteDb::addRobSens(int robotId, int sensorId)
+StatusCode SQLiteDb::addRobSens(const RobSensData& data)
 {
-    if (robotId <= 0 || sensorId <= 0){
+    if (data.robotId <= 0 || data.sensorId <= 0){
 
         return StatusCode::DB_QUERY_FAILED;
     }
 
     QSqlQuery query(db);
     query.prepare("INSERT INTO RobSens (robot_id, sensor_id) VALUES (:robot,:sensor)");
-    query.bindValue(":robot", robotId);
-    query.bindValue(":sensor", sensorId);
-
+    query.bindValue(":robot", data.robotId);
+    query.bindValue(":sensor", data.sensorId);
 
     if (!query.exec()) {
         qWarning() << statusToMessage(StatusCode::DB_QUERY_FAILED) << query.lastError().text();
@@ -281,9 +281,9 @@ StatusCode SQLiteDb::addRobSens(int robotId, int sensorId)
     return StatusCode::SUCCESS;
 }
 
-StatusCode SQLiteDb::addSession(int clientId, int robotId, int specId, int fieldId, const QString &status)
+StatusCode SQLiteDb::addSession(const SessionData& data)
 {
-    if (clientId <= 0 || robotId <= 0 || specId <= 0 || status.isEmpty()){
+     if (data.clientId <= 0 || data.robotId <= 0 || data.specId <= 0 || data.status.isEmpty()){
 
         return StatusCode::DB_QUERY_FAILED;
     }
@@ -291,11 +291,11 @@ StatusCode SQLiteDb::addSession(int clientId, int robotId, int specId, int field
     QSqlQuery query(db);
     query.prepare("INSERT INTO Sessions (client_id, robot_id, spec_id, field_id, status) "
                   "VALUES (:client, :robot, :spec, :field, :status)");
-    query.bindValue(":client", clientId);
-    query.bindValue(":robot", robotId);
-    query.bindValue(":spec", specId);
-    query.bindValue(":field", fieldId > 0 ? fieldId : QVariant(QVariant::Int));
-    query.bindValue(":status", status);
+    query.bindValue(":client", data.clientId);
+    query.bindValue(":robot", data.robotId);
+    query.bindValue(":spec", data.specId);
+    query.bindValue(":field", data.fieldId > 0 ? data.fieldId : QVariant(QVariant::Int));
+    query.bindValue(":status", data.status);
 
     if (!query.exec()) {
         qWarning() << statusToMessage(StatusCode::DB_QUERY_FAILED) << query.lastError().text();
@@ -304,18 +304,17 @@ StatusCode SQLiteDb::addSession(int clientId, int robotId, int specId, int field
     return StatusCode::SUCCESS;
 }
 
-StatusCode SQLiteDb::addSensorData(const QString &json, int mlResultId)
+StatusCode SQLiteDb::addSensorData(const SensorJsonData& data)
 {
-    if (json.isEmpty()){
+    if (data.json.isEmpty()){
 
         return StatusCode::DB_QUERY_FAILED;
     }
 
     QSqlQuery query(db);
     query.prepare("INSERT INTO Sensor_data (data_json, ML_result_id) VALUES (:j,:ml)");
-    query.bindValue(":j", json);
-    if (mlResultId > 0) query.bindValue(":ml", mlResultId);
-    else query.bindValue(":ml", QVariant(QVariant::Int));
+    query.bindValue(":j", data.json);
+    query.bindValue(":ml", data.mlResultId > 0 ? data.mlResultId : QVariant(QVariant::Int));
 
     if (!query.exec()) {
         qWarning() << statusToMessage(StatusCode::DB_QUERY_FAILED) << query.lastError().text();
@@ -324,9 +323,9 @@ StatusCode SQLiteDb::addSensorData(const QString &json, int mlResultId)
     return StatusCode::SUCCESS;
 }
 
-StatusCode SQLiteDb::addMLResult(int sessionId, const QString &moduleName, const QString &resultsJson, double confidence)
+StatusCode SQLiteDb::addMLResult(const MLResultData& data)
 {
-    if (sessionId <= 0 || moduleName.isEmpty() || resultsJson.isEmpty()){
+    if (data.sessionId <= 0 || data.moduleName.isEmpty() || data.resultsJson.isEmpty()){
 
         return StatusCode::DB_QUERY_FAILED;
     }
@@ -334,10 +333,10 @@ StatusCode SQLiteDb::addMLResult(int sessionId, const QString &moduleName, const
     QSqlQuery query(db);
     query.prepare("INSERT INTO ML_results (session_id, module_name, results_json, confidence) "
                   "VALUES (:session, :module, :results, :conf)");
-    query.bindValue(":session", sessionId);
-    query.bindValue(":module", moduleName);
-    query.bindValue(":results", resultsJson);
-    query.bindValue(":conf", confidence >= 0 ? confidence : QVariant(QVariant::Double));
+    query.bindValue(":session", data.sessionId);
+    query.bindValue(":module", data.moduleName);
+    query.bindValue(":results", data.resultsJson);
+    query.bindValue(":conf", data.confidence >= 0 ? data.confidence : QVariant(QVariant::Double));
 
     if (!query.exec()) {
         qWarning() << statusToMessage(StatusCode::DB_QUERY_FAILED) << query.lastError().text();
@@ -346,9 +345,9 @@ StatusCode SQLiteDb::addMLResult(int sessionId, const QString &moduleName, const
     return StatusCode::SUCCESS;
 }
 
-StatusCode SQLiteDb::addRecommendation(int mlResultId, const QString &text, const QString &priority, const QString &status, const QString &target)
+StatusCode SQLiteDb::addRecommendation(const RecommendationData& data)
 {
-    if (mlResultId <= 0 || text.isEmpty()){
+    if (data.mlResultId <= 0 || data.text.isEmpty()){
 
         return StatusCode::DB_QUERY_FAILED;
     }
@@ -357,11 +356,11 @@ StatusCode SQLiteDb::addRecommendation(int mlResultId, const QString &text, cons
 
     query.prepare("INSERT INTO Recommendations (ml_result_id, text, priority, status, target)"
                   " VALUES (:ml,:t,:p,:s,:tg)");
-    query.bindValue(":ml", mlResultId);
-    query.bindValue(":t", text);
-    query.bindValue(":p", priority);
-    query.bindValue(":s", status);
-    query.bindValue(":tg", target);
+    query.bindValue(":ml", data.mlResultId);
+    query.bindValue(":t", data.text);
+    query.bindValue(":p", data.priority);
+    query.bindValue(":s", data.status);
+    query.bindValue(":tg", data.target);
 
 
     if (!query.exec()){

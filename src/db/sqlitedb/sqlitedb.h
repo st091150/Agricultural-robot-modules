@@ -3,6 +3,8 @@
 
 #include "dbinterface.h"
 #include "statuscodes.h"
+#include "datatypes.h"
+
 
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -20,18 +22,19 @@ public:
     void disconnect() override;
 
     // Методы для безопасного добавления данных
-    StatusCode addClient(const QString &name);
-    StatusCode addSpecification(const QString &version);
+    StatusCode addClient(const ClientData& data);
+    StatusCode addSensor(const SensorData& data);
 
-    StatusCode addSensor(const QString &name, const QString &type, const QString &model);
-    StatusCode addSensorSpecification(int sensorId, const QString &type, int bytes);
-    StatusCode addSpecSens(int specId, int sensorSpecId);
-    StatusCode addRobot(const QString &model, int specId, const QString &description);
-    StatusCode addRobSens(int robotId, int sensorId);
-    StatusCode addSession(int clientId, int robotId, int specId, int fieldId = -1, const QString &status = "active");
-    StatusCode addSensorData(const QString &json, int mlResultId = -1);
-    StatusCode addMLResult(int sessionId, const QString &moduleName, const QString &resultsJson, double confidence = -1.0);
-    StatusCode addRecommendation(int mlResultId, const QString &text, const QString &priority = "medium", const QString &status = "new", const QString &target = QString());
+    StatusCode addSpecification(const SpecificationData& data);
+    StatusCode addSensorSpecification(const SensorSpecData& data);
+    StatusCode addSpecSens(const SpecSensData& data);
+    StatusCode addRobot(const RobotData& data);
+    StatusCode addRobSens(const RobSensData& data);
+    StatusCode addSession(const SessionData& data);
+    StatusCode addSensorData(const SensorJsonData& data);
+    StatusCode addMLResult(const MLResultData& data);
+    StatusCode addRecommendation(const RecommendationData& data);
+
 
 private:
     QSqlDatabase db;
