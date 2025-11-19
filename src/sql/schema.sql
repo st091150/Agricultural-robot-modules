@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS Routes (
     FOREIGN KEY(field_id) REFERENCES Fields(id)
 );
 
--- Таблица секторов
+-- Таблица сегментов
 CREATE TABLE IF NOT EXISTS Segments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     route_id INTEGER NOT NULL,
@@ -177,6 +177,7 @@ CREATE TABLE IF NOT EXISTS Sensor_specification (
     sensor_id INTEGER NOT NULL,
     type TEXT NOT NULL,
     bytes INTEGER NOT NULL,
+    description TEXT,
     FOREIGN KEY(sensor_id) REFERENCES Sensors(id)
 );
 

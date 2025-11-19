@@ -208,10 +208,11 @@ StatusCode SQLiteDb::addSensorSpecification(const SensorSpecData& data)
     }
 
     QSqlQuery query(db);
-    query.prepare("INSERT INTO Sensor_specification (sensor_id, type, bytes) VALUES (:s,:t,:b)");
+    query.prepare("INSERT INTO Sensor_specification (sensor_id, type, bytes, description) VALUES (:s,:t,:b, :d)");
     query.bindValue(":s", data.sensorId);
     query.bindValue(":t", data.type);
     query.bindValue(":b", data.bytes);
+    query.bindValue(":d", data.description.isEmpty() ? QVariant(QVariant::String) : data.description);
 
 
     if (!query.exec()) {
@@ -270,7 +271,8 @@ StatusCode SQLiteDb::addRobSens(const RobSensData& data)
     }
 
     QSqlQuery query(db);
-    query.prepare("INSERT INTO RobSens (robot_id, sensor_id) VALUES (:robot,:sensor)");
+    query.prepare("INSERT OR IGNORE INTO RobSens (robot_id, sensor_id) VALUES (:robot,:sensor)");
+
     query.bindValue(":robot", data.robotId);
     query.bindValue(":sensor", data.sensorId);
 

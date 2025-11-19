@@ -25,6 +25,7 @@ struct SensorSpecData {
     int sensorId;
     QString type;
     int bytes;
+    QString description;
 };
 
 // Связь спецификации и сенсора
