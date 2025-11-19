@@ -14,7 +14,7 @@ add_library(net
         src/network/Base.h
         src/network/Tcp.cc
         src/network/Udp.cc
-        #src/network/Http.cc
+        src/network/Http.cc
 )
 target_include_directories(net PUBLIC include)
 target_link_libraries(net PUBLIC Qt6::Core Qt6::Network)

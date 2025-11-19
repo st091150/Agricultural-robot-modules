@@ -20,7 +20,6 @@ void Tcp::open(const QString& host, const quint16 port) {
     if (!sock_.waitForConnected(3000)) {
         qInfo() << "connect error:" << sock_.errorString();
     }
-    emit connected();
 }
 
 void Tcp::close() {
@@ -28,7 +27,6 @@ void Tcp::close() {
     if (!sock_.waitForConnected(3000)) {
         qInfo() << "connect error:" << sock_.errorString();
     }
-    emit disconnected();
 }
 
 bool Tcp::isOpen() const {

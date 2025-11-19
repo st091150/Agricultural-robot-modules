@@ -27,17 +27,17 @@ public:
         return -1;
     };
 
-    virtual void get(const QUrl&) {
+    virtual void get(const QUrl& url) {
         emit error("GET not supported");
     }
 
-    virtual void post(const QUrl&, const QByteArray&, const QString&) {
+    virtual void post(const QUrl& url, const QByteArray& body, const QString& contentType) {
         emit error("POST not supported");
     }
 
     virtual Capabilities caps() const = 0;
 
-    virtual void open(const QUrl& target) = 0;
+    virtual void open(const QUrl& url) = 0;
     virtual void close() = 0;
     virtual bool isOpen() const = 0;
 

@@ -10,6 +10,7 @@ int main(int argc, char *argv[]) {
 
     qInfo() << "started";
 
+    /* Udp server
     QUdpSocket sock;
     sock.bind(QHostAddress("127.0.0.1"), 12345);
     QObject::connect(&sock, &QUdpSocket::readyRead, [&]() {
@@ -21,7 +22,7 @@ int main(int argc, char *argv[]) {
             sock.readDatagram(d.data(), d.size(), &from, &port);
             qInfo() << "DATA: " << d;
         }
-    });
+    });*/
 
 
     /* TCP server
