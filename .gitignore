@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyi
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.log
+*.sqlite3
+
+# Virtual environments
+venv/
+env/
+.env/
+
+# VSCode
+.vscode/
+.history/
+
+# Redis persistence files (если используются)
+dump.rdb
+*.rdb
+*.aof
+
+# IDE/OS-specific
+.DS_Store
+Thumbs.db
+
+# Uvicorn / FastAPI
+*.pid
+.
