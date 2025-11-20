@@ -1,0 +1,28 @@
+{
+    "description": "",
+    "tags": [],
+    "size": {
+        "height": 350,
+        "width": 350
+    },
+    "objects": [
+        {
+            "id": 15101029,
+            "classId": 22816,
+            "description": "",
+            "geometryType": "bitmap",
+            "labelerLogin": "vo@datasetninja.com",
+            "createdAt": "2023-07-24T08:59:06.586Z",
+            "updatedAt": "2023-07-24T08:59:06.586Z",
+            "tags": [],
+            "classTitle": "plant",
+            "bitmap": {
+                "data": "eJwBfASD+4lQTkcNChoKAAAADUlIRFIAAAFeAAABXAEDAAAAui1EUgAAAAZQTFRFAAAA////pdmf3QAAAAF0Uk5TAEDm2GYAAAQkSURBVHic7Zq9btswEMfFMCg7BFbGDkHsR+iYwbDyKHmEbM1g2Nr6WNWjCMjQjio61INhVvw+6kgLLNIgDe4PxJLJHz90d2SUHKu+KlBbApNIJBKJRCKRSCQS6b3pugR+wkUfs/ABldzf5lg2YHiZg3mXgHGZUd1OCq6q+7rHfepPNST/AYqX/YPAzyF0n9vxp4GV9fGBn3DPerCRE3KAfcieSQRrO6gWXHYrW9apb0Mlu09TWrmjVtXH6tEWqcHksdr36ym8WZnnq4IbFcxl2xyQX5fjPHbmdg3gqhmWsp/CdYBvbNGg4VMtuynMh0ocza0LHT33RkrZTmF2qKSzcBfmfq3gKVsx+fzNQgzA6+ZrqudfvgduYeXPzYan4J/S+VVYWD3v7pYdUHiNLlTG03KVCt7eJmIRxv0SwIdFCjaRZGB7/aJsNAc39vpdjbcIjZPwLsC8H2G8ZFmAjw5uR8PUKdi5DTQb7Vu3YnTMDtPTCbERXir4CfvbS0C4uhjNt++ycO1G+D16u9Lu6rOws5Ra8GsNc7wbOG3ACHca9vbB2trrbYD3WdgtzysH9z5asAZw/7nS1nFBiwT8bpbhuJtEZVBRL2oUFXS5J4QBqT2vrJJ7QhiQeukqqzRdkq1g1HA1itpzEju6Fpye3rWVF9V+BbRy9dC1orKwiOFHe4360DGlHMNj2PktirCFq0nBUp6i1blwYzIES6UFLLz0E4yDdDuuDJnaXlPwzvacgYcpvE/DPYat9wWCWQo2lEAdGziesw2VfwAvi+A+B+te4leD+jwcLxWRg7mGmzYBX2BYY/GbUna1G1hE1Ym3NAhPqnMwS1U/ZuBkX6vzcOItNa+79w6jt8YXg2/mkdeAr94GnP9DiEQikUgkEolEIpFIJBKJRCKRXkxF/8VFBwXOKZ/9xJrkt84rm6JMwgVsIg8S6bKkr3oeAXBbAEeJFjYDR4kWPjcMzIHOwg24nzUzTEIvspTrrQv32XNATgz0XBSg23kkaDaa4UKahcE8s4kyL5DhmIeBbRP5Oh3Bnf8KvBZn77RUSgMc4ADxUHdT1kwyzI4FIhHb+vGDkcAgibMKW/9hFAZppqgNYGDdkN/bIJYfJ+WhHQ4Nk/EHCfcQl9jbJuMPdoDQDsMmyQxS3b5dwtsm1w3Wh2+HvW3PjIEK70K8hdrTaGBI7hjsbXEwpgqw9zf2thjMruJdwf1JL7xHimcD+9W0PwNzaWCXe2PSwx+ysMu9idRRBD+N6PzdOHbiDBmo7OPGzVm4iwvO99xG35k8pUENT+pEGOkaweIYf6/DLHDGeBpaTWj8mJ+PFbDkLMyAcYYs5QSet5+FH0pgoBIY7GPz4l0J3BbA+NTMObiALXunmf0t/9fw7CsB1Bs5efA/wtlT1a8LF0VdUWykD238AQygURPwpmaoAAAAAElFTkSuQmCCrJsn+A==",
+                "origin": [
+                    0,
+                    1
+                ]
+            }
+        }
+    ]
+}

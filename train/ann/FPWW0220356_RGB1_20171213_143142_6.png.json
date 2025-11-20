@@ -1,0 +1,28 @@
+{
+    "description": "",
+    "tags": [],
+    "size": {
+        "height": 350,
+        "width": 350
+    },
+    "objects": [
+        {
+            "id": 15101083,
+            "classId": 22816,
+            "description": "",
+            "geometryType": "bitmap",
+            "labelerLogin": "vo@datasetninja.com",
+            "createdAt": "2023-07-24T09:00:53.625Z",
+            "updatedAt": "2023-07-24T09:00:53.625Z",
+            "tags": [],
+            "classTitle": "plant",
+            "bitmap": {
+                "data": "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",
+                "origin": [
+                    0,
+                    0
+                ]
+            }
+        }
+    ]
+}

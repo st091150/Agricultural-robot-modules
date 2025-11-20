@@ -1,0 +1,28 @@
+{
+    "description": "",
+    "tags": [],
+    "size": {
+        "height": 350,
+        "width": 350
+    },
+    "objects": [
+        {
+            "id": 15101149,
+            "classId": 22816,
+            "description": "",
+            "geometryType": "bitmap",
+            "labelerLogin": "vo@datasetninja.com",
+            "createdAt": "2023-07-24T09:03:01.626Z",
+            "updatedAt": "2023-07-24T09:03:01.626Z",
+            "tags": [],
+            "classTitle": "plant",
+            "bitmap": {
+                "data": "eJwBqQFW/olQTkcNChoKAAAADUlIRFIAAAFIAAABUAEDAAAA5191hgAAAAZQTFRFAAAA////pdmf3QAAAAF0Uk5TAEDm2GYAAAFRSURBVHic7dtBToNAGIZhkKSzMYwHMHIFly6MXMtF07LzWhyFG4g7EhsrIHGGBT+fpqz6Pgs6pG8H0pYNExLXuSaRvHWZXPpKK13r+60Su6ZIkrSWylIsfZX3pXL0d7vMw/A8ROniRGUYftoHPoa3P+yT24dhZ5eRk1we5PIol+V6MikqtXRyufzzAAAAAAAAAMB27uTySS7368nkRS4f4p2sNco83smsO9Tz0rpD7Wfll1E6ucxmHzsb5fwA1pz/LJNbuQSuz04u1ZXI/vKsL19mG5QAAAAAAAAArkShl5Valnr583Ijl86uBof1OaeHO4RlrbQZX5THItq/lWkrlF10DrbXYSM9X/M8bKQ70PdjWQnluJgn3Skfl+j8WjXYyWU4ha1K+x9d6GUdlY1ZNmE1M7fCxJvzxMxV1jn9OaDH39EWayr9F3b5OTcoF6+Sb7MwQPVET+0eAAAAAElFTkSuQmCCzs69Ew==",
+                "origin": [
+                    0,
+                    0
+                ]
+            }
+        }
+    ]
+}

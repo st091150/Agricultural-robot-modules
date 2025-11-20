@@ -1,0 +1,28 @@
+{
+    "description": "",
+    "tags": [],
+    "size": {
+        "height": 350,
+        "width": 350
+    },
+    "objects": [
+        {
+            "id": 15101116,
+            "classId": 22816,
+            "description": "",
+            "geometryType": "bitmap",
+            "labelerLogin": "vo@datasetninja.com",
+            "createdAt": "2023-07-24T09:01:57.712Z",
+            "updatedAt": "2023-07-24T09:01:57.712Z",
+            "tags": [],
+            "classTitle": "plant",
+            "bitmap": {
+                "data": "eJwBLwTQ+4lQTkcNChoKAAAADUlIRFIAAAFQAAABMwEDAAAAXUbJbgAAAAZQTFRFAAAA////pdmf3QAAAAF0Uk5TAEDm2GYAAAPXSURBVHic7Zo9jtQwFMftibTeAil7gBWJRAEdlFus1tyEK6wQBQUikSgo2RtwFHIDOEIKJCjdMcVojO1JHL/4600xGi3430zs+cl+sV++9H+EILXBgkVFRY9LV3j0KR69xqNPHhFanwS9PAl6dp3mtM69WJv3aLQ+AhVotEGj1Tc0SrsBPf/W67qKof78txE0sAB3EfRlj0YbvysWAPdvAzG087tuYHPOPCqz6Cw2+n1XsEknBJEsM9r0eXQ4/HI8+jHBMIh+SKDN3vxUE+rnlYNKqfeHHVCaQXfqpz6gVQplUkoHFX0crRQ6OGhiVKLQUcUxoT9SKJdSLOgyfzV4aG3Oa0LJg+0PJY4J1t/70GIwHYG/96HMJc9VBCaAFowaQkknDbp5C0f1JjK9o0YZHIeFRiVc8FGvRWicNbrlg06HMQe2hO0O6C6HCkJ3Ola1GX3mw0iN9e7rYDJnn0YrfR2YdTVoSpWetu71IQ8u+yKz1sygJDMq1ak9ydxKE09Ona+Tct+FPHXtQdXZlbdieDR0p46J49HAUyWmcBIHVR2B9ngWiWrsHj9qi0ePeL3+D/T63AEUFRUVFRUVFRUVFRUVFRUVFRWdTv25A/hXhfS6aX9UGQfCPrTogEdHPCrsoQrlVQpl1m3Q5mfKoiTM+iFU5FDrslQ5tLKmlPYnkygF6MqloD1opkadXdZJ1sTX6MoTnxzh1kN3XkbM5vEkbifZed7HCl12du+jAjRrFz04WhBtbZOJBLp4TJS4SdBZtziAaq+lwqPURSuIksWOYqDJvdVxbDgGmo23Ok5O1Gt07SF0PUBtwgYu3qXKo8mi43x0B+KpfZSL+egWooOHNnZ5TGGADT1gYjf2nE0ZjeQTEqh+qC1qNqqbLd/1omrUnrP5j1vUD4DZK0+jz2TCSK4AylModVF6qCqISaGtHVXKlOmt/rs3w2u0kY43vLqdmCTYWtS5Ds0U0LLlw5T6YjWGLoeApnKTQqFVXf/6nEBBuGyOaH0SBn0AXZ1jTbvSiyy3rmeqen4HUTWGQpk7GY/tZS2bP4K7f958iaCkfcFHgJL6ZwQlbTPCXQhcRhbtYXTxh3DbfIKboNDIO4OP9tFRr7/vWrdjeVZ4unwDjftUNnegbChcYHJQvQdFdlWi0qEReHSA6IhGU+p6gUV3m8iUXs0F3QZuXWExgUfH1atFXPWARpu+wqIcX+SwJ+CCTUi962DLctWWXyCrN9S7Aws9FgNS1EWi0O4Sou6jPfXlZF7fMtVAk3RdNs1UA03SaV3ham3uSabQboUKFKqFTq1HoOwn2l/F0XDfT31NQQAAAABJRU5ErkJggoHx750=",
+                "origin": [
+                    14,
+                    43
+                ]
+            }
+        }
+    ]
+}
