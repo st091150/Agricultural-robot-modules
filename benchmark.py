@@ -1,9 +1,9 @@
-# benchmark.py
+# benchmark.py — с выделением плохих примеров (IoU < 0.50)
 import torch
 import time
 import json
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 from pathlib import Path
 from tqdm import tqdm
 import pandas as pd
@@ -12,11 +12,30 @@ from config import *
 from models.deeplab_mnv3 import build_model
 from utils.augmentations import get_valid_augs
 
+# Цвета для оверлея
+COLOR_MAP = np.array([
+    [0, 100, 0],   # 0 background
+    [0, 255, 0],   # 1 crop
+    [255, 0, 0],   # 2 weed
+], dtype=np.uint8)
+
+def make_overlay(orig_img: Image.Image, pred_np: np.ndarray, alpha=0.5):
+    color = Image.fromarray(COLOR_MAP[pred_np])
+    color = color.resize(orig_img.size, Image.NEAREST)
+    return Image.blend(orig_img, color, alpha)
+
+def per_image_iou(gt: np.ndarray, pred: np.ndarray, num_classes=3):
+    ious = []
+    for c in range(num_classes):
+        gt_c = (gt == c)
+        pred_c = (pred == c)
+        inter = np.logical_and(gt_c, pred_c).sum()
+        union = np.logical_or(gt_c, pred_c).sum()
+        ious.append(inter / (union + 1e-8) if union > 0 else 1.0)
+    return np.mean(ious)
 
 def benchmark(model_weights: str = "/content/drive/MyDrive/Weed_Seg/weights/best_model.pth"):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Device: {device}")
-
     model = build_model(NUM_CLASSES).to(device)
     model.load_state_dict(torch.load(model_weights, map_location=device))
     model.eval()
@@ -26,11 +45,11 @@ def benchmark(model_weights: str = "/content/drive/MyDrive/Weed_Seg/weights/best
     with open(TEST_LIST) as f:
         names = [x.strip() for x in f if x.strip()]
 
-    # Глобальная confusion matrix
     hist = np.zeros((NUM_CLASSES, NUM_CLASSES), dtype=np.float64)
     inference_times = []
+    bad_cases = []  # список худших изображений
 
-    print(f"Бенчмарк на {len(names)} изображениях...\n")
+    print(f"Бенчмарк на {len(names)} изображениях + поиск плохих кейсов...\n")
 
     for name in tqdm(names, desc="Inference"):
         img_path = Path(IMAGES_DIR) / f"{name}.png"
@@ -49,92 +68,87 @@ def benchmark(model_weights: str = "/content/drive/MyDrive/Weed_Seg/weights/best
             pred = torch.argmax(pred, dim=1).cpu().numpy()[0]
         inference_times.append(time.time() - start)
 
-        # Ресайз к оригинальному размеру
         pred_pil = Image.fromarray(pred.astype(np.uint8))
         pred_resized = pred_pil.resize((w, h), Image.NEAREST)
         pred_np = np.array(pred_resized)
-
-        # GT
-        gt = np.array(Image.open(mask_path).convert("L")).astype(np.int64)
-
-        # Защита от мусорных классов после ресайза
         pred_np = np.clip(pred_np, 0, NUM_CLASSES - 1)
+
+        gt = np.array(Image.open(mask_path).convert("L")).astype(np.int64)
         gt = np.clip(gt, 0, NUM_CLASSES - 1)
 
-        # Обновляем глобальную матрицу ошибок
+        # Обновляем глобальную матрицу
         hist += np.bincount(
             NUM_CLASSES * gt.flatten() + pred_np.flatten(),
             minlength=NUM_CLASSES**2
         ).reshape(NUM_CLASSES, NUM_CLASSES)
 
+        # Считаем IoU для текущего изображения
+        img_iou = per_image_iou(gt, pred_np, NUM_CLASSES)
+
+        # Если плохо — сохраняем как плохой кейс
+        if img_iou < 0.50:
+            bad_cases.append({
+                "name": name,
+                "iou": img_iou,
+                "img_path": str(img_path)
+            })
+
+            # Сохраняем оверлей
+            overlay = make_overlay(orig_img, pred_np, alpha=0.55)
+            draw = ImageDraw.Draw(overlay)
+            try:
+                font = ImageFont.truetype("arial.ttf", 48)
+            except:
+                font = ImageFont.load_default()
+            draw.text((20, 20), f"IoU = {img_iou:.3f}", fill=(255,255,255), font=font, stroke_width=3, stroke_fill=(0,0,0))
+
+            bad_dir = Path("results/bad_cases")
+            bad_dir.mkdir(parents=True, exist_ok=True)
+            overlay.save(bad_dir / f"{name}_bad_iou_{img_iou:.3f}.png")
+
     # =============== Метрики ===============
     tp = np.diag(hist)
-    fp = hist.sum(axis=0) - tp
-    fn = hist.sum(axis=1) - tp
-    union = tp + fp + fn
-
+    union = hist.sum(1) + hist.sum(0) - tp
     iou = tp / (union + 1e-10)
     valid = union > 0
     miou = np.mean(iou[valid]) if valid.any() else 0.0
-
     pixel_acc = tp.sum() / hist.sum()
-
-    # F1 по классам
-    precision = tp / (tp + fp + 1e-10)
-    recall = tp / (tp + fn + 1e-10)
-    f1 = 2 * precision * recall / (precision + recall + 1e-10)
-    mean_f1 = np.mean(f1[valid]) if valid.any() else 0.0
-
-    fps = 1.0 / (sum(inference_times) / len(inference_times))
-
-    # =============== Сохранение результатов ===============
-    out_dir = Path("/content/drive/MyDrive/Weed_Seg/results")
-    out_dir.mkdir(exist_ok=True)
+    fps = 1.0 / (np.mean(inference_times))
 
     class_names = ["Background", "Crop", "Weed"]
 
-    # TXT отчёт
-    with open(out_dir / "benchmark_report.txt", "w", encoding="utf-8") as f:
-        f.write("═" * 60 + "\n")
-        f.write("       WEED SEGMENTATION BENCHMARK REPORT\n")
-        f.write("═" * 60 + "\n\n")
-        f.write(f"Модель: {Path(model_weights).name}\n")
-        f.write(f"Изображений: {len(names)}\n")
-        f.write(f"Вход: {INPUT_SIZE}x{INPUT_SIZE}\n")
-        f.write(f"FPS: {fps:.2f}\n\n")
-        f.write(f"mIoU           : {miou:.4f}\n")
-        f.write(f"Mean F1        : {mean_f1:.4f}\n")
-        f.write(f"Pixel Accuracy : {pixel_acc:.4f}\n\n")
-        f.write("IoU по классам:\n")
-        for i in range(NUM_CLASSES):
-            if valid[i]:
-                f.write(f"   {class_names[i]:10} → {iou[i]:.4f}  (пикселей в GT: {int(hist.sum(1)[i]):,})\n")
-            else:
-                f.write(f"   {class_names[i]:10} →   —   (не встречался)\n")
+    # =============== Сохранение отчёта ===============
+    out_dir = Path("/content/drive/MyDrive/Weed_Seg/results")
+    out_dir.mkdir(exist_ok=True)
 
-    # JSON + CSV
-    data = {
-        "model": str(model_weights),
+    with open(out_dir / "benchmark_report.txt", "w", encoding="utf-8") as f:
+        f.write("WEED SEGMENTATION BENCHMARK + BAD CASES\n")
+        f.write("="*60 + "\n")
+        f.write(f"Модель: {Path(model_weights).name}\n")
+        f.write(f"Тестовых изображений: {len(names)}\n")
+        f.write(f"mIoU: {miou:.4f} | Pixel Acc: {pixel_acc:.4f} | FPS: {fps:.2f}\n\n")
+        f.write("IoU по классам:\n")
+        for i, name in enumerate(class_names):
+            f.write(f"   {name:10} → {iou[i]:.4f}\n")
+        f.write("\nПлохие кейсы (IoU < 0.50): {len(bad_cases)} из {len(names)}\n")
+        for case in sorted(bad_cases, key=lambda x: x["iou"])[:20]:  # топ-20 худших
+            f.write(f"   • {case['name']} → IoU = {case['iou']:.3f}\n")
+
+    # JSON
+    json_data = {
         "mIoU": float(miou),
-        "mean_F1": float(mean_f1),
         "Pixel_Accuracy": float(pixel_acc),
         "FPS": float(fps),
-        "per_class": {class_names[i]: {"IoU": float(iou[i]), "F1": float(f1[i])} for i in range(NUM_CLASSES)}
+        "bad_cases_count": len(bad_cases),
+        "bad_cases": [c["name"] for c in sorted(bad_cases, key=lambda x: x["iou"])[:50]]
     }
-    with open(out_dir / "metrics.json", "w") as f:
-        json.dump(data, f, indent=2)
+    with open(out_dir / "summary.json", "w") as f:
+        json.dump(json_data, f, indent=2)
 
-    pd.DataFrame({
-        "Class": class_names + ["mIoU / mean F1"],
-        "IoU": list(iou) + [miou],
-        "F1": list(f1) + [mean_f1]
-    }).to_csv(out_dir / "metrics.csv", index=False)
-
-    print("\n" + "="*60)
-    print(f"mIoU = {miou:.4f} | FPS = {fps:.2f}")
-    print("Отчёт сохранён в results/")
-    print("="*60)
-
+    print("\nБенчмарк завершён!")
+    print(f"mIoU = {miou:.4f} | Плохих кейсов (IoU<0.5): {len(bad_cases)}/{len(names)}")
+    print(f"Плохие примеры сохранены в results/bad_cases/")
+    print(f"Отчёт → results/benchmark_report.txt")
 
 if __name__ == "__main__":
     import sys
