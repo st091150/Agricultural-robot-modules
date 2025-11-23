@@ -25,6 +25,11 @@
     - `statusmapper.h` - функции для перевода кода в сообщение
     - `logmessages.h` - шаблоны и константы сообщений логирования
   - `datatypes.h` — унифицированные структуры для хранения и парсинга информации
+- **redis/**
+  - `redismanager.h`- объявление класса RedisManager для подписки на каналы и обработки сообщений
+  - `redismanager.cpp`- реализация методов RedisManager
+  - `routessetup.h`- объявление функции setupRoutes для регистрации обработчиков сообщений
+  - `routessetup.cpp`- реализация setupRoutes и шаблонов обработчиков
   
 - `CMakeLists.txt` - конфигурация сборки CMake
 - `README.md` - документация проекта
