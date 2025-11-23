@@ -16,6 +16,7 @@ class RedisManager : public QObject
 public:
     explicit RedisManager(QObject *parent = nullptr);
 
+    // данные, которые приходят после парсинга
     using Payload = std::variant<
         ClientData,
         SpecificationData,
@@ -30,17 +31,22 @@ public:
         RecommendationData
         >;
 
+    // подписчик Redis
     class RedisObserver {
     public:
         RedisObserver() = default;
-        void subscribe(const std::string& channel,
-                       std::function<void(const QString&, const QString&)> callback);
+        void subscribe(
+            const std::string& channel,
+            std::function<void(const QString&, const QString&)> callback
+            );
     private:
         cpp_redis::subscriber sub;
     };
 
     void start(const std::string &channel);
     void addRoute(const QString &type, std::function<void(const Payload&)> handler);
+
+    /// главный метод — вызывается сетевым модулем
     void handleParsedMessage(const QString &type, const Payload &data);
 
 signals:
