@@ -1,21 +1,10 @@
-import time, math, os, base64
+import time, os, base64
 from threading import Lock
 from geographiclib.geodesic import Geodesic
-
-IMAGE_FOLDER = "./images"
-IMAGE_FILES = sorted([f for f in os.listdir(IMAGE_FOLDER)
-                      if f.lower().endswith(('.png', '.jpg', '.jpeg'))])
-IMAGE_STEP_M = 1.0  # каждый метр меняем изображение
-
-if IMAGE_FILES:
-    with open(os.path.join(IMAGE_FOLDER, IMAGE_FILES[0]), "rb") as f:
-        IMAGE_SIZE_BYTES = len(f.read())
-else:
-    IMAGE_SIZE_BYTES = 0
-
+from config import *
 
 class Robot:
-    def __init__(self, latitude=54.123, longitude=30.123, rotation_angle=0.0):
+    def __init__(self, latitude=START_LATITUDE, longitude=START_LONGITUDE, rotation_angle=START_ANGLE):
         self.latitude = latitude
         self.longitude = longitude
         self.rotation_angle = rotation_angle 
@@ -42,12 +31,15 @@ class Robot:
     def update_position(self):
         """Обновление координат и смена изображения"""
         now = time.time()
-        dt = now - self.last_update
-        self.last_update = now
 
         with self.lock:
-            if self.speed_mps == 0:
+            if self.speed_mps == 0 or self.mode not in ["moving", "speed"]:
+                self.last_update = now
                 return
+
+            # время с последнего обновления позиции
+            dt = now - self.last_update
+            self.last_update = now
 
             ds = abs(self.speed_mps) * dt
 
@@ -60,9 +52,11 @@ class Robot:
                 else:
                     self.move_remaining_m -= ds
 
+            # знак движения (вперед/назад)
             sign = 1 if self.speed_mps >= 0 else -1
             ds_signed = ds * sign
 
+            # вычисление новой позиции
             result = Geodesic.WGS84.Direct(
                 self.latitude,
                 self.longitude,
@@ -72,11 +66,13 @@ class Robot:
             self.latitude = result["lat2"]
             self.longitude = result["lon2"]
 
+            # обновление изображения каждые IMAGE_STEP_M метров
             self.distance_accum += abs(ds)
             while self.distance_accum >= IMAGE_STEP_M:
                 self.distance_accum -= IMAGE_STEP_M
                 self.img_index += 1
                 self.image_base64 = self.load_image(self.img_index)
+
 
     def stop(self):
         """Останавливает робота"""
@@ -85,17 +81,16 @@ class Robot:
             self.mode = "idle"
             self.move_remaining_m = 0
 
-    def rotate(self, delta_angle):
-        """Поворот на угол в градусах"""
-        with self.lock:
-            self.rotation_angle = (self.rotation_angle + delta_angle) % 360
-
-    def move(self, distance_m, speed_mps=1.0):
-        """Задаем движение на distance_m метров с заданной скоростью"""
+    def move(self, distance_m, speed_mps=START_SPEED):
         with self.lock:
             self.move_remaining_m = abs(distance_m)
             self.speed_mps = speed_mps if distance_m >= 0 else -speed_mps
             self.mode = "moving" if distance_m != 0 else "idle"
+            self.last_update = time.time()
+
+    def rotate(self, delta_angle):
+        with self.lock:
+            self.rotation_angle = (self.rotation_angle + delta_angle) % 360
 
     def get_state(self):
         """Возвращает текущие данные робота"""
