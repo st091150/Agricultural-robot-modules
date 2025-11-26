@@ -2,9 +2,6 @@ from PIL import Image
 import os
 import base64
 
-import os
-from PIL import Image
-
 def resize_images_in_folder(input_folder: str, output_folder: str, target_size: tuple[int, int] = (256, 256)):
     """
     Приводит все изображения в папке к единому размеру и сохраняет их в output_folder с последовательными именами,
