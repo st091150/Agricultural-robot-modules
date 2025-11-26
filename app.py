@@ -12,14 +12,7 @@ def command_api(command: CommandModel):
 
 @app.get("/collect")
 def state_api():
-    robot.update_position()
-    with robot.lock:
-        return {
-            "latitude": robot.latitude,
-            "longitude": robot.longitude,
-            "rotation_angle": robot.rotation_angle,
-            "img_base64": robot.image_base64,
-        }
+    return robot.get_state()
 
 @app.get("/spec")
 def spec_api():
@@ -27,8 +20,5 @@ def spec_api():
 
 @app.post("/stop")
 def stop_robot():
-    with robot.lock:
-        robot.speed_mps = 0
-        robot.mode = "idle"
-        robot.move_remaining_m = 0
+    robot.stop()
     return {"status": "stopped"}

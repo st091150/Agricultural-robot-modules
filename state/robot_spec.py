@@ -15,7 +15,7 @@ def get_spec():
             "name": "orientation",
             "model": "ROT-1",
             "observations": [
-                {"description": "rotation_angle", "datatype": "uint16", "bytes": 2},
+                {"description": "rotation_angle", "datatype": "int", "bytes": 4},
             ],
         },
         {
